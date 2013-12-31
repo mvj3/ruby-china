@@ -1,8 +1,7 @@
 body {
   padding:0 7px;
-  padding-top:50px;
 }
-.navbar-fixed-top { position: fixed; }
+.navbar-fixed-top {  margin-bottom:8px; }
 .container,
 .navbar-fixed-top .container  { width:auto; padding: 0; min-width:0; max-width:940px;}
 .sidebar { display:none; }
@@ -57,23 +56,23 @@ table.node_topics .replies {
   a.feed {color:#B70000;}
 }
 #reply.form {
-  textarea { width: 98%; height: 80px; }
+  textarea { width: 100%; height: 80px; }
   .submit_buttons {
     position:static;
     float:none;
     .help-inline { display:none; }
   }
   .helpblock { display:none; }
-  #preview  { width: 98%; padding:0; }
+  #preview  { width: 100%; padding:0; }
 }
 #new_topic {
-  #preview  { width: 98%; padding:0; }
+  #preview  { width: 100%; padding:0; }
+  .control-label { display:none; }
 }
-textarea.long {  width: 98%; height: 80px; }
+textarea.long {  width: 100%; height: 80px; }
 .help-block { display:none; }
 #reply .editor_toolbar {
   width:100%;
-  .pull-right { display:none; }
 }
 form {
   margin-bottom: 0px;
@@ -225,4 +224,15 @@ form {
 
 .home_suggest_topics {
   .box { width:auto; position: static;}
+  .topics {
+    .topic { 
+      height:auto;
+      .title {
+        white-space:break-all;
+        overflow:auto;
+      }
+    }
+    .topic:nth-child(odd) { width:auto; float:none;  clear:left; }
+    .topic:nth-child(even) { width:auto; padding-left:0; margin-left:-10px; }
+  }
 }

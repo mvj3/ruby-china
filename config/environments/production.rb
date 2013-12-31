@@ -5,6 +5,8 @@ RubyChina::Application.configure do
   # The production environment is meant for finished, "live" apps.
   # Code is not reloaded between requests
   config.cache_classes = true
+  
+  config.eager_load = true
 
   # Full error reports are disabled and caching is turned on
   config.consider_all_requests_local       = false
@@ -21,15 +23,14 @@ RubyChina::Application.configure do
 
   # Use a different logger for distributed setups
   # config.logger = Logger.new("#{Rails.root}/log/#{Rails.env}.log", 'weekly')
-  # config.logger.level = Logger::INFO
+  # config.log_level = :info
 
   # Use a different cache store in production
-  # config.cache_store = :mem_cache_store
   config.cache_store = [:dalli_store,"127.0.0.1", {:namespace => "rb-cn", :compression => true}]
 
   # Disable Rails's static asset server
   # In production, Apache or nginx will already do this
-  config.serve_static_assets = true
+  config.serve_static_assets = false
 
   # Enable serving of images, stylesheets, and javascripts from an asset server
   config.action_controller.asset_host = Setting.upload_url
@@ -54,17 +55,12 @@ RubyChina::Application.configure do
   config.assets.compress = true
 
   # Don't fallback to assets pipeline if a precompiled asset is missed
-  config.assets.compile = true
+  config.assets.compile = false
 
   # Generate digests for assets URLs
   config.assets.digest = true
 
   config.assets.js_compressor  = :uglifier
   config.assets.css_compressor = :scss
-  config.assets.precompile += %w(application.css app.js topics.css topics.js window.css front.css cpanel.css search.css
-  users.css pages.css pages.js notifications.js notifications.css sites.css sites.js notes.css notes.js 
-  gfdynamicfeedcontrol.css gfdynamicfeedcontrol.js mobile.css home.css)
-
 
 end
-

@@ -1,3 +1,4 @@
+# coding: utf-8
 require 'spec_helper'
 
 describe Topic do
@@ -88,5 +89,22 @@ describe Topic do
     t.deleted_at.should_not == nil
     t1 = Factory(:topic)
     t1.destroy_by(nil).should == false
+  end
+  
+  describe "#auto_space_with_en_zh" do
+    it "should auto fix on save" do
+      topic.title = "Gitlab怎么集成GitlabCI"
+      topic.save
+      topic.reload
+      topic.title.should == "Gitlab 怎么集成 GitlabCI"
+    end
+  end
+  
+  describe "#excellent" do
+    it "should suggest a topic as excellent" do
+      topic.excellent = 1
+      topic.save
+      Topic.excellent.should include(topic)
+    end
   end
 end

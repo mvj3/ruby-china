@@ -41,9 +41,14 @@ module TopicsHelper
                         :rel => "twipsy"
   end
 
-  def render_topic_title(topic)
+  def topic_title_tag(topic)
     return t("topics.topic_was_deleted") if topic.blank?
     link_to(topic.title, topic_path(topic), :title => topic.title)
+  end
+  
+  def topic_excellent_tag(topic)
+    return "" if !topic.excellent?
+    raw %(<i class="icon small_cert_on" title="精华贴"></i>)
   end
 
   def render_topic_last_reply_time(topic)

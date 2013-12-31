@@ -21,13 +21,6 @@ class TopicsCell < BaseCell
     render
   end
 
-  # 热门节点
-  cache :sidebar_hot_nodes, :expires_in => 1.days
-  def sidebar_hot_nodes
-    @hot_nodes = Node.hots.limit(10)
-    render
-  end
-
   # 置顶话题
   cache :sidebar_suggest_topics do |cell|
     CacheVersion.topic_last_suggested_at
@@ -38,14 +31,14 @@ class TopicsCell < BaseCell
   end
 
   # 节点下面的最新话题
-  cache :sidebar_for_node_recent_topics, :expires_in => 20.minutes do |cell, args|
-    args[:topic].id
+  cache :sidebar_for_node_recent_topics, :expires_in => 30.minutes do |cell, args|
+    ['node',args[:topic].node_id].join("-")
   end
   def sidebar_for_node_recent_topics(args = {})
     topic = args[:topic]
     limit = topic.replies_count > 20 ? 20 : topic.replies_count
     limit = 1 if limit == 0
-    @topics = topic.node.topics.recent.limit(limit)
+    @topics = topic.node.topics.recent.not_in(id: [topic.id]).limit(limit)
     render
   end
 
@@ -57,18 +50,6 @@ class TopicsCell < BaseCell
   cache :index_locations, :expires_in => 1.days
   def index_locations
     @hot_locations = Location.hot.limit(12)
-    render
-  end
-
-  cache :high_likes_topics, :expires_in => 3.hours
-  def high_likes_topics
-    @topics = Topic.by_week.high_likes.limit(10)
-    render
-  end
-
-  cache :high_replies_topics, :expires_in => 3.hours
-  def high_replies_topics
-    @topics = Topic.by_week.high_replies.limit(10)
     render
   end
 

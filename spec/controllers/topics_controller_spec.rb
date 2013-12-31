@@ -5,6 +5,7 @@ describe TopicsController do
   let(:topic) { Factory :topic, :user => user }
   let(:user) { Factory :user }
   let(:newbie) { Factory :newbie }
+  let(:admin) { Factory :admin }
 
   describe ":index" do
     it "should have an index action" do
@@ -16,6 +17,7 @@ describe TopicsController do
   describe ":feed" do
     it "should have a feed action" do
       get :feed
+      response.headers['Content-Type'].should == 'application/xml; charset=utf-8'
       response.should be_success
     end
   end
@@ -56,7 +58,7 @@ describe TopicsController do
         get :new
         response.should be_success
       end
-      
+
       it "should not allow access from newbie user" do
         sign_in newbie
         get :new
@@ -120,4 +122,35 @@ describe TopicsController do
     end
   end
 
+  describe "#suggest" do
+    it "should not allow user suggest" do
+      sign_in user
+      put :suggest, :id => topic
+      topic.reload.excellent.should == 0
+    end
+
+    it "should not allow user suggest by admin" do
+      sign_in admin
+      put :suggest, :id => topic
+      topic.reload.excellent.should == 1
+    end
+  end
+
+  describe "#unsuggest" do
+    context "suggested topic" do
+      let!(:topic) { FactoryGirl.create(:topic, :excellent => 1) }
+
+      it "should not allow user suggest" do
+        sign_in user
+        put :unsuggest, :id => topic
+        topic.reload.excellent.should == 1
+      end
+
+      it "should not allow user suggest by admin" do
+        sign_in admin
+        put :unsuggest, :id => topic
+        topic.reload.excellent.should == 0
+      end
+    end
+  end
 end

@@ -119,18 +119,18 @@ describe TopicsHelper do
 
     it "should highlight code block after the content" do
       helper.format_topic_body("this code:\n```\ngem install rails\n```\n").should ==
-        %(<p>this code:</p>\n<pre class=\"highlight text\">gem install rails\n</pre>)
+        %(<p>this code:</p>\n<pre class=\"highlight plaintext\">gem install rails\n</pre>)
     end
 
     it "should highlight code block without language" do
       helper.format_topic_body("```\ngem install ruby\n```").gsub("\n",'').should ==
-        %(<pre class=\"highlight text\">gem install ruby</pre>)
+        %(<pre class=\"highlight plaintext\">gem install ruby</pre>)
     end
 
     it "should not filter underscore" do
       helper.format_topic_body("ruby_china_image `ruby_china_image`").should == "<p>ruby_china_image <code>ruby_china_image</code></p>"
       helper.format_topic_body("```\nruby_china_image\n```").should ==
-        %(<pre class=\"highlight text\">ruby_china_image\n</pre>)
+        %(<pre class=\"highlight plaintext\">ruby_china_image\n</pre>)
     end
   end
 
@@ -146,13 +146,13 @@ describe TopicsHelper do
     it "should result when logined user did not favorite topic" do
       user.stub(:favorite_topic_ids).and_return([])
       helper.stub(:current_user).and_return(user)
-      helper.topic_favorite_tag(topic).should == %(<a href="#" class="icon small_bookmark" data-id="#{topic.id}" onclick="return Topics.favorite(this);" rel="twipsy" title="收藏"></a>)
+      helper.topic_favorite_tag(topic).should == %(<a class="icon small_bookmark" data-id="#{topic.id}" href="#" onclick="return Topics.favorite(this);" rel="twipsy" title="收藏"></a>)
     end
 
     it "should result when logined user favorited topic" do
       user.stub(:favorite_topic_ids).and_return([topic.id])
       helper.stub(:current_user).and_return(user)
-      helper.topic_favorite_tag(topic).should == %(<a href="#" class="icon small_bookmarked" data-id="#{topic.id}" onclick="return Topics.favorite(this);" rel="twipsy" title="取消收藏"></a>)
+      helper.topic_favorite_tag(topic).should == %(<a class="icon small_bookmarked" data-id="#{topic.id}" href="#" onclick="return Topics.favorite(this);" rel="twipsy" title="取消收藏"></a>)
     end
 
     it "should result blank when unlogin user" do

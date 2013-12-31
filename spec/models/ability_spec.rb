@@ -24,15 +24,17 @@ describe Ability do
     let(:ability){ Ability.new(wiki_editor) }
     let(:page_locked) { Factory :page, :locked => true }
     it { should_not be_able_to(:destroy, Page) }
+    it { should_not be_able_to(:suggest, Topic) }
+    it { should_not be_able_to(:unsuggest, Topic) }
     it { should be_able_to(:create, Page) }
     it { should be_able_to(:update, Page) }
     it { should_not be_able_to(:update, page_locked)}
   end
-  
+
   context "Site editor users" do
     let(:site_editor) { Factory :user, :replies_count => 100 }
     let(:ability){ Ability.new(site_editor) }
-    
+
     context "Site" do
       it { should be_able_to(:read, Site) }
       it { should be_able_to(:create, Site) }
@@ -47,7 +49,6 @@ describe Ability do
     let(:comment) { Factory :comment, :user => user }
     let(:note_publish) { Factory :note, :publish => true }
 
-    
     let(:ability){ Ability.new(user) }
 
     context "Topic" do
@@ -55,6 +56,8 @@ describe Ability do
       it { should be_able_to(:create, Topic) }
       it { should be_able_to(:update, topic) }
       it { should be_able_to(:destroy, topic) }
+      it { should_not be_able_to(:suggest, Topic) }
+      it { should_not be_able_to(:unsuggest, Topic) }
     end
 
     context "Reply" do
@@ -101,12 +104,55 @@ describe Ability do
       it { should be_able_to(:destroy, comment) }
     end
   end
-  
+
   context "Newbie users" do
     let(:newbie) { Factory :newbie }
     let(:ability){ Ability.new(newbie) }
     context "Topic" do
       it { should_not be_able_to(:create, Topic) }
+      it { should_not be_able_to(:suggest, Topic) }
+      it { should_not be_able_to(:unsuggest, Topic) }
+    end
+  end
+
+  context "Blocked users" do
+    let(:blocked_user) { Factory :blocked_user }
+    let(:ability){ Ability.new(blocked_user) }
+
+    context "Topic" do
+      it { should_not be_able_to(:create, Topic) }
+    end
+    context "Reply" do
+      it { should_not be_able_to(:create, Reply) }
+    end
+    context "Comment" do
+      it { should_not be_able_to(:create, Comment) }
+    end
+    context "Photo" do
+      it { should_not be_able_to(:create, Photo) }
+    end
+    context "Page" do
+      it { should_not be_able_to(:create, Page) }
+    end
+  end
+
+  context "Deleted users" do
+    let(:deleted_user) { Factory :deleted_user }
+    let(:ability){ Ability.new(deleted_user) }
+    context "Topic" do
+      it { should_not be_able_to(:create, Topic) }
+    end
+    context "Reply" do
+      it { should_not be_able_to(:create, Reply) }
+    end
+    context "Comment" do
+      it { should_not be_able_to(:create, Comment) }
+    end
+    context "Photo" do
+      it { should_not be_able_to(:create, Photo) }
+    end
+    context "Page" do
+      it { should_not be_able_to(:create, Page) }
     end
   end
 end

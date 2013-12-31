@@ -25,8 +25,6 @@ class Reply
   index :user_id => 1
   index :topic_id => 1
 
-  attr_accessible :body
-  
   delegate :title, :to => :topic, :prefix => true, :allow_nil => true
   delegate :login, :to => :user, :prefix => true, :allow_nil => true
 
@@ -38,7 +36,7 @@ class Reply
       self.errors.add(:body,"请勿回复无意义的内容，如你想收藏或赞这篇帖子，请用帖子后面的功能。")
     end
   end
-  
+
   after_create :update_parent_topic
   def update_parent_topic
     topic.update_last_reply(self)
@@ -46,38 +44,45 @@ class Reply
 
   # 更新的时候也更新话题的 updated_at 以便于清理缓存之类的东西
   after_update :update_parent_topic_updated_at
+  # 删除的时候也要更新 Topic 的 updated_at 以便清理缓存
+  after_destroy :update_parent_topic_updated_at
   def update_parent_topic_updated_at
     if not self.topic.blank?
-      self.topic.set(:updated_at, Time.now)
+      self.topic.touch
     end
   end
+  
+  
 
   after_create do
     Reply.delay.send_topic_reply_notification(self.id)
   end
-  
+
   def self.per_page
     50
   end
-  
 
   def self.send_topic_reply_notification(reply_id)
     reply = Reply.find_by_id(reply_id)
     return if reply.blank?
-    topic = reply.topic
+    topic = Topic.find_by_id(reply.topic_id)
     return if topic.blank?
+
+    notified_user_ids = reply.mentioned_user_ids
+
     # 给发帖人发回帖通知
-    if reply.user_id != topic.user_id && !reply.mentioned_user_ids.include?(topic.user_id)
+    if reply.user_id != topic.user_id && !notified_user_ids.include?(topic.user_id)
       Notification::TopicReply.create :user_id => topic.user_id, :reply_id => reply.id
-      reply.notified_user_ids << topic.user_id
+      notified_user_ids << topic.user_id
     end
 
     # 给关注者发通知
     topic.follower_ids.each do |uid|
       # 排除同一个回复过程中已经提醒过的人
-      next if reply.notified_user_ids.include?(uid)
+      next if notified_user_ids.include?(uid)
       # 排除回帖人
       next if uid == reply.user_id
+      puts "Post Notification to: #{uid}"
       Notification::TopicReply.create :user_id => uid, :reply_id => reply.id
     end
     true

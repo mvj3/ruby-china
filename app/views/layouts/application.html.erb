@@ -7,7 +7,7 @@
                     /____/
   ========================================================
                                           ruby-china.org
-        
+
   App Environments:
   --------------------------------------------------------
   Ruby:  <%= RUBY_VERSION %><%= "-p#{RUBY_PATCHLEVEL}" if defined? RUBY_PATCHLEVEL %>
@@ -17,8 +17,7 @@
 <html>
 <head>
   <%= render_page_title %>
-  <%= stylesheet_link_tag "front" %>
-  <%= controller_stylesheet_link_tag %>
+  <%= stylesheet_link_tag "front", "data-turbolinks-track" => true %>
   <%= yield :styles %>
   <% if mobile? %>
     <%= stylesheet_link_tag "mobile" %>
@@ -34,15 +33,15 @@
   <%= raw SiteConfig.custom_head_html %>
   <%= csrf_meta_tag %>
   <%= auto_discovery_link_tag(:rss,feed_topics_url,:title => '订阅最新帖') %>
-
+  <%= javascript_include_tag "app", "data-turbolinks-track" => true %>
   <%= yield :node_feed_link %>
 </head>
-<body data-offset="50">
+<body data-offset="50" data-controller-name="<%= controller_name %>">
   <div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
       <div class="container">
         <h3>
-          <a href="/"><%= image_tag("text_logo.png", :style => "width:123px;height:29px;") %></a>
+          <a href="/" class="site-logo"></a>
         </h3>
         <%= render_list :class => "nav" do |li|
            li << link_to(t("menu.topics"), topics_path)
@@ -65,7 +64,7 @@
       </div>
       <div class="feed_link hidden-phone">
         <% if not mobile? %>
-          <%= link_to(raw("<span class='icon icons_rss'></span> Feed"), feed_topics_url, :title => t("topics.subscribe_with_rss", :name => Setting.app_name), :class => "feed") %>
+          <%= link_to(raw("<span class='icon icons_rss'></span> Feed"), feed_topics_url, :title => t("topics.subscribe_with_rss", :name => Setting.app_name), :class => "feed", :target => "_blank") %>
         <% end %>
       </div>
     <% end %>
@@ -80,25 +79,25 @@
   <a class="go_top" href="#"><i class="icon icons_go_top"></i></a>
   <footer class="footer">
     <div class="container">
-      <%= raw SiteConfig.footer_html %> 
+      <%= raw SiteConfig.footer_html %>
     </div>
   </footer>
   <% end %>
-
-  <%= javascript_include_tag "app" %>
-  <%= controller_javascript_include_tag %>
   <% if mobile? %>
     <script type="text/javascript">
     app_mobile = true;
     $('body').animate({ scrollTop: -1 },0);
     </script>
   <% end %>
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript" data-turbolinks-eval=false>
     ROOT_URL = "<%= root_url %>";
     FAYE_SERVER_URL = "<%= Setting.faye_server %>";
     <% if current_user %>
       CURRENT_USER_ACCESS_TOKEN = "<%= current_user.temp_access_token %>";
     <% end %>
+    if (FAYE_SERVER_URL) {
+      App.initNotificationSubscribe();
+    }
   </script>
   <%= yield :scripts %>
   <script type="text/javascript">

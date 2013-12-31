@@ -2,7 +2,11 @@
 class Cpanel::SitesController < Cpanel::ApplicationController
 
   def index
-    @sites = Site.unscoped.recent.paginate(:page => params[:page], :per_page => 20)
+    @sites = Site.unscoped.recent
+    if params[:q]
+      @sites = @sites.where(:name => /#{params[:q]}/)
+    end
+    @sites = @sites.paginate(:page => params[:page], :per_page => 20)
 
     respond_to do |format|
       format.html # index.html.erb
@@ -33,7 +37,7 @@ class Cpanel::SitesController < Cpanel::ApplicationController
   end
 
   def create
-    @site = Site.new(params[:site])
+    @site = Site.new(params[:site].permit!)
 
     respond_to do |format|
       if @site.save
@@ -50,7 +54,7 @@ class Cpanel::SitesController < Cpanel::ApplicationController
     @site = Site.unscoped.find(params[:id])
 
     respond_to do |format|
-      if @site.update_attributes(params[:site])
+      if @site.update_attributes(params[:site].permit!)
         format.html { redirect_to(cpanel_sites_path, :notice => 'Site 更新成功。') }
         format.json
       else

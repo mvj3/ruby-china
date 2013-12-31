@@ -22,6 +22,7 @@
     reply_success: "Replied Successfully"
     reply_this_floor: "Reply to this floor"
     add_image: "Upload image"
+    insert_codes: "Insert Codes"
     topic_was_deleted: "[Topic was deleted]"
     have_no_new_reply: "No new activites since your last read."
     has_new_replies: "contains new reply."

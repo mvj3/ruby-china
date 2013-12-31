@@ -1,18 +1,18 @@
 require 'spec_helper'
 
-USING_PARANOIA = false
-
 class WalkingDead
   include Mongoid::Document
   include Mongoid::BaseModel
-
-  if USING_PARANOIA
-    include Mongoid::Paranoia
-  else
-    include Mongoid::SoftDelete
-  end
+  include Mongoid::Attributes::Dynamic
+  include Mongoid::Timestamps
+  include Mongoid::SoftDelete
 
   field :name
+  field :tag
+  
+  after_destroy do
+    self.tag = "after_destroy #{self.name}"
+  end
 end
 
 describe "Soft Delete" do
@@ -35,6 +35,12 @@ describe "Soft Delete" do
       rick.destroy
     }.to change {rick.deleted_at}.from(nil)
   end
+  
+  it "should use deleted?" do
+    expect {
+      rick.destroy
+    }.to change { rick.deleted? }.from(false).to(true)
+  end
 
   it "should mark as destroyed and get proper query result" do
     rick.destroy
@@ -42,5 +48,11 @@ describe "Soft Delete" do
 
     WalkingDead.where(:name => rick.name).count.should == 0
     WalkingDead.unscoped.where(:name => rick.name).first.should eq(rick)
+  end
+  
+  it 'is run callback after destroy' do
+    rick.name = "foo"
+    rick.destroy
+    rick.tag.should == "after_destroy foo"
   end
 end

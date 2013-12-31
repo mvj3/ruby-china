@@ -35,8 +35,8 @@ class NotesController < ApplicationController
   end
 
   def create
-    @note = current_user.notes.new(params[:note])
-
+    @note = current_user.notes.new(note_params)
+    @note.publish = note_params[:publish] == "1"
     if @note.save
       redirect_to(@note, :notice => t("common.create_success"))
     else
@@ -46,8 +46,7 @@ class NotesController < ApplicationController
 
   def update
     @note = current_user.notes.find(params[:id])
-
-    if @note.update_attributes(params[:note])
+    if @note.update_attributes(note_params)
       redirect_to(@note, :notice => t("common.update_success"))
     else
       render :action => "edit"
@@ -63,5 +62,11 @@ class NotesController < ApplicationController
     @note.destroy
 
     redirect_to(notes_url)
+  end
+  
+  private
+  
+  def note_params
+    params.require(:note).permit(:title, :body, :publish)
   end
 end

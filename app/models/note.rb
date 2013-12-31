@@ -10,15 +10,13 @@ class Note
   field :body
   field :word_count, :type => Integer
   field :changes_count, :type =>  Integer, :default => 0
-  field :publish, :type => Boolean, :default => false
+  field :publish, :type => Mongoid::Boolean, :default => false
   belongs_to :user
   
   counter :hits,:default => 0
 
   index :user_id => 1
   index :updated_at => -1
-
-  attr_accessible :title, :body, :publish
 
   scope :recent_updated, desc(:updated_at)
   scope :published, where(publish: true)
@@ -34,7 +32,7 @@ class Note
   before_update :update_changes_count
   def update_changes_count
     self.changes_count = 0 if self.changes_count.blank?
-    self.inc(:changes_count,1)
+    self.inc(changes_count: 1)
   end
 
 end

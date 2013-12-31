@@ -1,4 +1,5 @@
 # coding: utf-8
+require "auto-space"
 class Topic
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -30,7 +31,9 @@ class Topic
   # 用于排序的标记
   field :last_active_mark, :type => Integer
   # 是否锁定节点
-  field :lock_node, :type => Boolean, :default => false
+  field :lock_node, :type => Mongoid::Boolean, :default => false
+  # 精华贴 0 否， 1 是
+  field :excellent, type: Integer, default: 0
 
   belongs_to :user, :inverse_of => :topics
   counter_cache :name => :user, :inverse_of => :topics
@@ -40,7 +43,6 @@ class Topic
   belongs_to :last_reply, :class_name => 'Reply'
   has_many :replies, :dependent => :destroy
 
-  attr_accessible :title, :body
   validates_presence_of :user_id, :title, :body, :node_id
 
   index :node_id => 1
@@ -48,6 +50,7 @@ class Topic
   index :last_active_mark => -1
   index :likes_count => 1
   index :suggested_at => 1
+  index :excellent => -1
 
   counter :hits, :default => 0
   
@@ -57,13 +60,14 @@ class Topic
   # scopes
   scope :last_actived, desc(:last_active_mark)
   # 推荐的话题
-  scope :suggest, where(:suggested_at.ne => nil).desc(:suggested_at)
-  scope :fields_for_list, without(:body,:body_html)
-  scope :high_likes, desc(:likes_count, :_id)
-  scope :high_replies, desc(:replies_count, :_id)
-  scope :no_reply, where(:replies_count => 0)
-  scope :popular, where(:likes_count.gt => 5)
+  scope :suggest, -> { where(:suggested_at.ne => nil).desc(:suggested_at) }
+  scope :fields_for_list, -> { without(:body,:body_html) }
+  scope :high_likes, -> { desc(:likes_count, :_id) }
+  scope :high_replies, -> { desc(:replies_count, :_id) }
+  scope :no_reply, -> { where(:replies_count => 0) }
+  scope :popular, -> { where(:likes_count.gt => 5) }
   scope :without_node_ids, Proc.new { |ids| where(:node_id.nin => ids) }
+  scope :excellent, -> { where(:excellent.gte => 1) }
 
   def self.find_by_message_id(message_id)
     where(:message_id => message_id).first
@@ -84,6 +88,10 @@ class Topic
   def store_cache_fields
     self.node_name = self.node.try(:name) || ""
   end
+  before_save :auto_space_with_title
+  def auto_space_with_title
+    self.title.auto_space!
+  end
 
   before_create :init_last_active_mark_on_create
   def init_last_active_mark_on_create
@@ -93,12 +101,12 @@ class Topic
   def push_follower(uid)
     return false if uid == self.user_id
     return false if self.follower_ids.include?(uid)
-    self.push(:follower_ids,uid)
+    self.push(follower_ids: uid)
   end
 
   def pull_follower(uid)
     return false if uid == self.user_id
-    self.pull(:follower_ids,uid)
+    self.pull(follower_ids: uid)
   end
 
   def update_last_reply(reply)
@@ -133,5 +141,9 @@ class Topic
     Rails.cache.fetch([self,"reply_ids"]) do
       self.replies.only(:_id).map(&:_id)
     end
+  end
+  
+  def excellent?
+    self.excellent >= 1
   end
 end

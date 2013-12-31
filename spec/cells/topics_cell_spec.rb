@@ -21,12 +21,6 @@ describe TopicsCell do
     end
   end
 
-  describe "sidebar_hot_nodes" do
-    it "should render sidebar hot nodes" do
-      render_cell(:topics, :sidebar_hot_nodes).should have_css("div.hot_nodes li", :count => 1)
-    end
-  end
-
   describe "sidebar_suggest_topics" do
     it "should render sidebar_suggest_topics" do
       render_cell(:topics, :sidebar_suggest_topics).should have_css("div.suggest_topics", :count => 1)
@@ -50,30 +44,16 @@ describe TopicsCell do
     end
   end
 
-  describe "high topics" do
-    before(:each) do
-      t1 = Factory(:topic)
-      t2 = Factory(:topic)
-      t3 = Factory(:topic)
-    end
-
-    it "should render high_likes_topics" do
-      count = Topic.by_week.count
-      count = 10 if count > 10
-      render_cell(:topics, :high_likes_topics).should have_css('div.high_likes_topics li', :count => count)
-    end
-
-    it "should render high_replies_topics" do
-      count = Topic.by_week.count
-      count = 10 if count > 10
-      render_cell(:topics, :high_replies_topics).should have_css('div.high_replies_topics li', :count => count)
-    end
-  end
-
   describe "sidebar_for_node_recent_topics" do
     let(:node) { Factory(:node) }
     let(:topic0) { Factory(:topic, :node => node) }
+
+    it "should not render if node only has one topic" do
+      render_cell(:topics, :sidebar_for_node_recent_topics, :topic => topic0).should_not have_css("div.box ul li")
+    end
+
     it "should render" do
+      topic1 = Factory(:topic, :node => node)
       render_cell(:topics, :sidebar_for_node_recent_topics, :topic => topic0).should have_css("div.box ul li", :count => 1)
     end
 
@@ -82,6 +62,7 @@ describe TopicsCell do
       reply1 = Factory(:reply, :topic => topic0)
       reply2 = Factory(:reply, :topic => topic0)
       topic1 = Factory(:topic, :node => node)
+      topic2 = Factory(:topic, :node => node)
       render_cell(:topics, :sidebar_for_node_recent_topics, :topic => topic0).should have_css("div.box ul li", :count => 2)
     end
   end

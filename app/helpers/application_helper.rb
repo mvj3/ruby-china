@@ -15,21 +15,27 @@ module ApplicationHelper
   end
 
   def controller_stylesheet_link_tag
+    fname = ""
     case controller_name
-    when "users","home", "topics", "pages", "search", "sites", "notifications", "notes"
-      stylesheet_link_tag controller_name
+    when "users", "home", "topics", "pages", "notes"
+      fname = "#{controller_name}.css"
     when "replies"
-      stylesheet_link_tag "topics"
+      fname = "topics.css"
     end
+    return "" if fname.blank?
+    raw %(<link href="#{asset_path(fname)}" rel="stylesheet" data-turbolinks-track />)
   end
 
   def controller_javascript_include_tag
+    fname = 
     case controller_name
-    when "pages","topics","sites", "notifications", "notes"
-      javascript_include_tag controller_name
+    when "pages","topics","notes"
+      fname = "#{controller_name}.js"
     when "replies"
-      javascript_include_tag "topics"
+      fname = "topics.js"
     end
+    return "" if fname.blank?
+    raw %(<script src="#{asset_path(fname)}" data-turbolinks-track></script>)
   end
 
   def markdown(str, options = {})
@@ -94,5 +100,20 @@ module ApplicationHelper
     agent_str = request.user_agent.to_s.downcase
     return false if agent_str =~ /ipad/
     agent_str =~ Regexp.new(MOBILE_USER_AGENTS)
+  end
+
+  # 可按需修改
+  LANGUAGES_LISTS = { "Ruby" => "ruby", "HTML / ERB" => "erb", "CSS / SCSS" => "scss", "JavaScript" => "js", 
+                      "YAML <i>(.yml)</i>" => "yml", "CoffeeScript" => "coffee", "Nginx / Redis <i>(.conf)</i>" => "conf",
+                      "Python" => "python", "PHP" => "php", "Java" => "java", "Erlang" => "erlang", "Shell / Bash" => "shell" }
+
+  def insert_code_menu_items_tag
+    lang_list = []
+    LANGUAGES_LISTS.each do |k, l|
+      lang_list << content_tag(:li) do
+        content_tag(:a, raw(k), id: l, class: 'insert_code', data: { content: l })
+      end
+    end
+    raw lang_list.join("")
   end
 end

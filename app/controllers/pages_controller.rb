@@ -9,7 +9,7 @@ class PagesController < ApplicationController
   def index
     set_seo_meta("Wiki")
     drop_breadcrumb("索引")
-    
+
     fresh_when(:etag => [SiteConfig.wiki_index_html])
   end
 
@@ -17,7 +17,7 @@ class PagesController < ApplicationController
     @pages = Page.recent.paginate(:page => params[:page], :per_page => 30)
     set_seo_meta t("pages.wiki_index")
     drop_breadcrumb t("common.index")
-    
+
     fresh_when(:etag => [@pages])
   end
 
@@ -35,7 +35,7 @@ class PagesController < ApplicationController
       fresh_when(:etag => [@page,@page.comments_count])
     end
   end
-  
+
   def comments
     @page = Page.find_by_slug(params[:id])
   end
@@ -58,7 +58,7 @@ class PagesController < ApplicationController
   end
 
   def create
-    @page = Page.new(params[:page])
+    @page = Page.new(page_params)
     @page.user_id = current_user.id
     @page.version_enable = true
 
@@ -74,7 +74,7 @@ class PagesController < ApplicationController
     @page.version_enable = true
     @page.user_id = current_user.id
 
-    if @page.update_attributes(params[:page])
+    if @page.update_attributes(page_params)
       redirect_to page_path(@page.slug), notice: t("common.update_success")
     else
       render action: "edit"
@@ -93,5 +93,9 @@ protected
 
   def init_base_breadcrumb
     drop_breadcrumb("Wiki", pages_path)
+  end
+
+  def page_params
+    params.require(:page).permit(:title, :body, :slug, :change_desc)
   end
 end

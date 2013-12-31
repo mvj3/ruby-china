@@ -1,6 +1,6 @@
 #pages {
-  .tools { 
-    text-align:right; margin-bottom:10px; 
+  .tools {
+    text-align:right; margin-bottom:10px;
     a {
       margin-left:10px;
     }
@@ -30,5 +30,12 @@
   border-radius: 3px 3px 3px 3px;
   -moz-border-radius: 3px 3px 3px 3px;
   display: none;
+  padding:4px;
   overflow: scroll;
+}
+
+.page_form {
+  .editor_toolbar{
+    width: 680px;
+  }
 }

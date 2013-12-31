@@ -1,5 +1,3 @@
-//= require gfdynamicfeedcontrol
-//= require gadget
 .topics .topic .title a:link,
 .topics .topic .title a:visited,
 .node_topics .title a:link,
@@ -14,7 +12,10 @@
     .avatar { width:56px; margin-left:10px; }
     .infos { padding-right:74px; }
     .right_info { padding-left:66px;}
-    .title { font-size:14px; margin-top:2px; margin-bottom:6px; }
+    .title { 
+      font-size:14px; margin-top:2px; margin-bottom:6px; 
+      i { margin-bottom:-1px; }
+    }
     .info {
       color:#bbb; margin-bottom:2px;
       font-size:12px;
@@ -43,6 +44,19 @@
   .body {
     margin-bottom:10px; margin-top:8px;
     img { max-width:690px;}
+  }
+  .excellent {
+    background:#fffce9; 
+    border-top:1px solid #fff3e6;
+    border-bottom:1px solid #fff3e6;
+    margin: 0px -10px 10px -10px;
+    padding:4px 10px;
+    color:#da974d; font-size:12px;
+    .icon { margin-bottom:-1px; }
+    .opts { 
+      text-align:right; font-size:10px; 
+      a { margin-left:10px; color:#aaa; }
+    }
   }
   .tools {
     text-align:right; height:16px; overflow:hidden;
@@ -145,7 +159,10 @@ form .node_select {
 }
 
 #replies {
-  .total { padding:0 10px 6px 10px; border-bottom:1px solid #DDD; color:#999; margin:0 -10px; }
+  .total { 
+    padding:0 10px 6px 10px; border-bottom:1px solid #DDD; color:#999; margin:0 -10px; 
+    a { color:#666; text-decoration: underline; }
+  }
   .pagination { padding:8px 10px 0 10px; margin:0 -10px; }
   .reply {
     border-bottom:1px solid #DDD; padding:8px 10px; margin:0 -10px;
@@ -165,8 +182,17 @@ form .node_select {
       a:link,
       a:visited { color:#999; }
       .name {
-        float:left;
-        a { text-decoration:underline; margin-right:8px; }
+        a { 
+          color:#888;
+          text-decoration:none; font-weight:bold; margin-right:8px; 
+          &:hover { color:#555; }
+        }
+      }
+      .time {
+        a.reply-floor { 
+          margin-right: 0; color:#bbb; text-decoration: none; 
+          &:hover {color:#999;}
+        }
       }
       .opts {
         float:right; text-align:right;
@@ -178,6 +204,8 @@ form .node_select {
       a.reply_link img { vertical-align:middle;}
     }
     .body {
+      text-align:left;
+      margin-top:5px;
       img { max-width:622px;}
     }
   }
@@ -195,11 +223,15 @@ form .node_select {
 
 /* Topic & Reply body format */
 .topics .topic .body,
-#replies .reply .body {
+#replies .reply .body,
+.markdown_body {
   position:relative;
-  line-height:160%; font-size:14px; text-overflow: ellipsis; word-wrap: break-word;
-  p { font-size:14px; line-height:160%; margin-bottom:10px;  }
+  line-height: 1.8em; font-size:14px; text-overflow: ellipsis; word-wrap: break-word;
+  p { font-size:14px; margin-bottom: 20px; line-height: 1.6em; }
+  p:last-of-type { margin-bottom:0; }
+  hr { border:1px solid #e0e0e0; border-bottom:0px; margin: 18px auto; width:50%; }
   blockquote {
+    margin-left:20px;
     p { font-size:13px; color:#666; font-weight:normal; line-height:150%; }
   }
   code { margin:0 2px; font-family:Monaco,Menlo, "Courier New", monospace;}
@@ -208,18 +240,24 @@ form .node_select {
   a:hover { text-decoration: underline; color:#00438A; }
   a.at_floor { color:#376B43; }
   a.at_user {
-    color:#333; font-weight:bold;
+    color:#000; font-weight:bold;
     i { color:#777; }
   }
-  h4 { font-weight:bold; font-size:15px; line-height:100%; margin:0; color:#222; margin-top:20px; border-left:15px solid #eee; padding-left:5px; margin-bottom:8px;  }
+  h4 { font-weight:bold; font-size:16px; line-height:100%; margin:0; color:#222; margin-top:20px; border-left:15px solid #eee; padding-left:5px; margin-bottom:8px;  }
   strong { color:#000; }
   ul,
   ol {
     list-style-position: inside;
+    list-style-type: square;
     margin:0;
-    padding:5px 14px;
+    padding:5px 24px;
     p { margin:0; }
-    li { line-height:160%; color:#333; font-size:13px; }
+    li { line-height:1.8em; color:#333; font-size:13px; }
+    ul { list-style-type: circle; }
+  }
+  ol { 
+    list-style-type: decimal; 
+    ol { list-style-type: lower-alpha; }
   }
   img { vertical-align: top; }
 }
@@ -252,6 +290,10 @@ form .node_select {
     }
   }
   .more { }
+}
+
+.editor_toolbar {
+  a.icon { margin-left:4px; }
 }
 
 #reply {
@@ -312,9 +354,11 @@ form .node_select {
   border: 1px solid #ccc;
   padding:4px;
   min-height:400px;
+  overflow:hidden;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
+  img { max-width:510px; }
   #reply & {
     width:578px;
     margin-bottom:10px;
@@ -324,3 +368,12 @@ form .node_select {
 
 #topic_upload_images { position:absolute;bottom:0;right:0;width:0;height:0;overflow:hidden; }
 
+
+.new_topic,
+.edit_topic,
+.edit_reply {
+  .control-group:last-of-type { margin-bottom:0px; }
+  .topic_editor { width:99%; height: 400px; }
+  #preview { width:99%; }
+  .btn-primary { width:100px; }
+}
